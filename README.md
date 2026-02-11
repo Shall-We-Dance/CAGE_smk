@@ -1,6 +1,6 @@
-# CAGE_smk: CAGE-seq Snakemake Pipeline
+# CAGE Snakemake Pipeline
 
-**CAGE-seq** workflow, with **STAR** as the aligner and **single-end (SE)** mode as the default.
+**CAGE** workflow, with **STAR** as the aligner and **single-end (SE)** mode as the default.
 
 ## Pipeline Overview
 
