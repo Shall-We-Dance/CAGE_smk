@@ -1,0 +1,9 @@
+name: cager
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - bioconductor-cager=1.20.0
+  - bioconductor-genomicranges
+  - bioconductor-iranges
+  - r-base

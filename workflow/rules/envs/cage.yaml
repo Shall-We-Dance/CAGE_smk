@@ -1,10 +1,8 @@
-name: bowtie2
+name: cage
 channels:
   - bioconda
   - conda-forge
 dependencies:
-  - bowtie2
-  - openjdk
-  - picard
   - samtools
-  - bedtools
+  - bedtools=2.27.1
+  - ucsc-bedgraphtobigwig

@@ -6,9 +6,8 @@ configfile: "config.yaml"
 
 include: "rules/common.smk"
 include: "rules/qc_fastp.smk"
-include: "rules/align_bowtie2.smk"
-include: "rules/bam_to_bigwig.smk"
-include: "rules/macs3.smk"
+include: "rules/align_star.smk"
+include: "rules/cage_ctss.smk"
 
 MULTIQC_TARGET = (
     f"{OUTDIR}/qc/multiqc/multiqc_report.html"
@@ -24,13 +23,10 @@ if MULTIQC_TARGET:
 if KEEP_BAM:
     PRIMARY_TARGETS += [final_bam_path(sample) for sample in SAMPLES]
     PRIMARY_TARGETS += [final_bai_path(sample) for sample in SAMPLES]
-PRIMARY_TARGETS += expand(f"{OUTDIR}/bigwig/{{sample}}/{{sample}}.raw.bw", sample=SAMPLES)
-PRIMARY_TARGETS += expand(f"{OUTDIR}/bigwig/{{sample}}/{{sample}}.normalized.bw", sample=SAMPLES)
-if config.get("run_macs3", True):
-    PRIMARY_TARGETS += expand(f"{OUTDIR}/macs3/{{sample}}/{{sample}}_peaks.narrowPeak", sample=SAMPLES)
-    PRIMARY_TARGETS += expand(f"{OUTDIR}/macs3/{{sample}}/{{sample}}_summits.bed", sample=SAMPLES)
-    PRIMARY_TARGETS += expand(f"{OUTDIR}/macs3/{{sample}}/{{sample}}_peaks.xls", sample=SAMPLES)
-
+PRIMARY_TARGETS += expand(f"{OUTDIR}/ctss/{{sample}}/{{sample}}.ctss.tsv", sample=SAMPLES)
+PRIMARY_TARGETS += expand(f"{OUTDIR}/bigwig/{{sample}}/{{sample}}.5prime.raw.bw", sample=SAMPLES)
+PRIMARY_TARGETS += expand(f"{OUTDIR}/bigwig/{{sample}}/{{sample}}.5prime.cpm.bw", sample=SAMPLES)
+PRIMARY_TARGETS += expand(f"{OUTDIR}/cager/{{sample}}/{{sample}}_tagClusters.bed", sample=SAMPLES)
 rule all:
     input:
         PRIMARY_TARGETS

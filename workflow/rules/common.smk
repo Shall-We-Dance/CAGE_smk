@@ -4,7 +4,7 @@ from snakemake.io import temp
 
 OUTDIR = config.get("output", {}).get("dir", "results")
 SAMPLES = list(config.get("samples", {}).keys())
-READ_TYPE = config.get("read_type", "PE").upper()
+READ_TYPE = config.get("read_type", "SE").upper()
 
 FILTER_BLACKLIST = bool(config.get("filter_blacklist", False))
 REMOVE_DUPLICATES = bool(config.get("remove_duplicates", True))
@@ -29,16 +29,16 @@ def blacklist_path():
 
 
 def unique_bam_path(sample):
-    return f"{OUTDIR}/bowtie2/{sample}/{sample}.unique.bam"
+     return f"{OUTDIR}/star/{sample}/{sample}.unique.bam"
 
 
 def filtered_bam_path(sample):
-    return f"{OUTDIR}/bowtie2/{sample}/{sample}.unique.filtered.bam"
+    rreturn f"{OUTDIR}/star/{sample}/{sample}.unique.filtered.bam"
 
 
 def dedup_bam_path(sample):
     suffix = "unique.filtered" if FILTER_BLACKLIST else "unique"
-    return f"{OUTDIR}/bowtie2/{sample}/{sample}.{suffix}.dedup.bam"
+    return f"{OUTDIR}/star/{sample}/{sample}.{suffix}.dedup.bam"
 
 
 def final_bam_path(sample):
@@ -58,7 +58,8 @@ def is_single_end():
 
 def aligned_bam_path(sample):
     suffix = "se" if is_single_end() else "pe"
-    return f"{OUTDIR}/bowtie2/{sample}/{sample}_{suffix}.bam"
+    return f"{OUTDIR}/star/{sample}/{sample}_{suffix}.bam"
+
 
 
 def maybe_temp(path):
@@ -92,9 +93,9 @@ def bam_flagstat_paths(sample):
     return paths
 
 
-def bowtie2_log_path(sample):
+def align_log_path(sample):
     suffix = "se" if is_single_end() else "pe"
-    return f"logs/bowtie2/{sample}_{suffix}.log"
+    return f"logs/star/{sample}_{suffix}.log"
 
 def validate_blacklist_config():
     if not FILTER_BLACKLIST:

@@ -1,0 +1,10 @@
+name: star
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - star
+  - samtools
+  - bedtools
+  - openjdk
+  - picard

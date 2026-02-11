@@ -1,6 +1,0 @@
-name: macs3
-channels:
-  - bioconda
-  - conda-forge
-dependencies:
-  - macs3
