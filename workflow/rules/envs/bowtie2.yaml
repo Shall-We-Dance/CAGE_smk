@@ -1,0 +1,10 @@
+name: bowtie2
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - bowtie2
+  - openjdk
+  - picard
+  - samtools
+  - bedtools
