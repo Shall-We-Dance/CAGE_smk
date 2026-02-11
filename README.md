@@ -59,6 +59,39 @@ For sample `sampleA`:
 - `results/cager/sampleA/sampleA_tagClusters.bed`
 - `results/qc/multiqc/multiqc_report.html`
 
+## Output Example
+
+A typical output layout after a successful run looks like this:
+
+```text
+results/
+├── qc/
+│   ├── fastp/
+│   │   └── ...
+│   ├── bam_stats/
+│   │   └── <sample>/
+│   │       ├── <sample>_se.flagstat.txt
+│   │       ├── <sample>.unique.flagstat.txt
+│   │       └── <sample>.unique.filtered.dedup.flagstat.txt
+│   └── multiqc/
+│       └── multiqc_report.html
+├── star/                              # present when keep_bam: true
+│   └── <sample>/
+│       ├── <sample>_se.bam
+│       ├── <sample>.unique.bam
+│       └── <sample>.unique.filtered.dedup.bam
+├── ctss/
+│   └── <sample>/
+│       └── <sample>.ctss.tsv
+├── cager/
+│   └── <sample>/
+│       └── <sample>_tagClusters.bed
+└── bigwig/
+    └── <sample>/
+        ├── <sample>.5prime.raw.bw
+        └── <sample>.5prime.cpm.bw
+```
+
 ## Notes and Caveats
 
 1. **bedGraphToBigWig dependency**: `ucsc-bedgraphtobigwig` is included in `envs/cage.yaml`, but package naming/availability may differ across platforms.
