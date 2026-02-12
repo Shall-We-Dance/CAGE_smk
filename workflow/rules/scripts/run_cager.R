@@ -29,7 +29,13 @@ ctss_gr <- GenomicRanges::GRanges(
   score = ctss$counts
 )
 
-ce <- CAGEset(genomeName = "unknown")
+ce <- if (exists("CAGEset", where = asNamespace("CAGEr"), mode = "function")) {
+  CAGEset(genomeName = "unknown")
+} else if (exists("CAGEexp", where = asNamespace("CAGEr"), mode = "function")) {
+  CAGEexp(genomeName = "unknown")
+} else {
+  stop("Neither CAGEset() nor CAGEexp() is available in the installed CAGEr version")
+}
 CTSStagCountSE(ce, sample_name) <- ctss_gr
 sampleLabels(ce) <- sample_name
 
