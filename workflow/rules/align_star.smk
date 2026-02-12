@@ -192,16 +192,25 @@ if REMOVE_DUPLICATES:
         shell:
             r"""
             set -euo pipefail
-            mkdir -p $(dirname {output.bam}) $(dirname {output.flagstat})
+             mkdir -p $(dirname {output.bam}) $(dirname {output.flagstat}) $(dirname {log})
 
             if [ "{params.method}" = "picard" ]; then
+                set +e
                 picard --java-options "{params.picard_java_opts}" MarkDuplicates \
                     I={input.bam} \
                     O={output.bam} \
                     M={output.metrics} \
                     REMOVE_DUPLICATES=true \
                     VALIDATION_STRINGENCY=LENIENT \
-                    2> {log}
+                    > {log} 2>&1
+                picard_status=$?
+                set -e
+
+                if [ $picard_status -ne 0 ]; then
+                    echo "Picard MarkDuplicates failed (exit code: $picard_status). Falling back to samtools markdup." >> {log}
+                    samtools markdup -r -@ {threads} {input.bam} {output.bam} >> {log} 2>&1
+                    samtools flagstat {output.bam} > {output.metrics}
+                fi
             else
                 samtools markdup -r -@ {threads} {input.bam} {output.bam} 2> {log}
                 samtools flagstat {output.bam} > {output.metrics}
