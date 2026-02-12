@@ -33,7 +33,7 @@ def unique_bam_path(sample):
 
 
 def filtered_bam_path(sample):
-    rreturn f"{OUTDIR}/star/{sample}/{sample}.unique.filtered.bam"
+    return f"{OUTDIR}/star/{sample}/{sample}.unique.filtered.bam"
 
 
 def dedup_bam_path(sample):
