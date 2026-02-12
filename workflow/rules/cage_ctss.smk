@@ -69,9 +69,21 @@ rule build_ctss_and_bigwig:
             chr=$1; start=$2; end=$3; strand=$6; count=$7;
             pos1=start+1;
             print chr, pos1, strand, count;
-            print chr, start, end, count > "{output.raw_bg}";
             total+=count;
-        }} END{{print total > "'$tmp_dir'/total.txt"}}' "$tmp_dir/ctss_cov.bed" > {output.ctss}
+        }} END{{print total+0 > "'$tmp_dir'/total.txt"}}' "$tmp_dir/ctss_cov.bed" > {output.ctss}
+
+        # Merge + and - strands at identical genomic coordinates for bedGraph/bigWig output.
+        # bedGraphToBigWig rejects duplicate intervals, which can occur when both strands
+        # contribute reads at the same 5' position.
+        awk 'BEGIN{{OFS="\t"}} {{
+            key=$1 FS $2 FS $3;
+            sum[key]+=$7;
+        }} END{{
+            for (k in sum) {{
+                split(k, f, FS);
+                print f[1], f[2], f[3], sum[k];
+            }}
+        }}' "$tmp_dir/ctss_cov.bed" | sort -k1,1 -k2,2n -k3,3n > {output.raw_bg}
 
         total=$(cat "$tmp_dir/total.txt")
         if [ "$total" -eq 0 ]; then
