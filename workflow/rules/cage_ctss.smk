@@ -35,12 +35,27 @@ rule build_ctss_and_bigwig:
 
         # Create 1bp, strand-aware intervals at the most 5' nucleotide of each read.
         samtools view -@ {threads} -F {params.exclude_flags} {input.bam} | \
-        awk 'BEGIN{{OFS="\t"}} {{
-            chrom=$3; start=$4-1; strand="+";
-            if (and($2,16)) strand="-";
-            len=length($10);
+        awk 'BEGIN{{OFS="\t"}}
+            function ref_len(cigar,   len, n, op, chunk) {{
+                len=0;
+                while (match(cigar, /^[0-9]+[MIDNSHP=X]/)) {{
+                    chunk=substr(cigar, RSTART, RLENGTH);
+                    op=substr(chunk, length(chunk), 1);
+                    n=substr(chunk, 1, length(chunk)-1) + 0;
+                    if (op ~ /[MDN=X]/) len += n;
+                    cigar=substr(cigar, RLENGTH+1);
+                }}
+                return len;
+            }}
+        {{
+            chrom=$3;
+            start=$4-1;
+            strand="+";
+            if (int($2/16)%2) strand="-";
+            aln_len=ref_len($6);
+            if (aln_len<1) next;
             if (strand=="+") {{s=start; e=start+1;}}
-            else {{s=start+len-1; e=start+len;}}
+            else {{s=start+aln_len-1; e=start+aln_len;}}
             if (s>=0) print chrom, s, e, ".", 1, strand;
         }}' | sort -k1,1 -k2,2n -k3,3n -k6,6 > "$five_prime_all"
 
@@ -54,7 +69,7 @@ rule build_ctss_and_bigwig:
             chr=$1; start=$2; end=$3; strand=$6; count=$7;
             pos1=start+1;
             print chr, pos1, strand, count;
-            print chr, start, end, count >> "{output.raw_bg}";
+            print chr, start, end, count > "{output.raw_bg}";
             total+=count;
         }} END{{print total > "'$tmp_dir'/total.txt"}}' "$tmp_dir/ctss_cov.bed" > {output.ctss}
 
