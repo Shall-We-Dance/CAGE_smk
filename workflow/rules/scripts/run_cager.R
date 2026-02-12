@@ -36,7 +36,24 @@ ce <- if (exists("CAGEset", where = asNamespace("CAGEr"), mode = "function")) {
 } else {
   stop("Neither CAGEset() nor CAGEexp() is available in the installed CAGEr version")
 }
-CTSStagCountSE(ce, sample_name) <- ctss_gr
+
+set_ctss_success <- FALSE
+
+if (methods::is(ce, "CAGEexp") &&
+    exists("CTSStagCountSE", where = asNamespace("CAGEr"), mode = "function")) {
+  CTSStagCountSE(ce, sample_name) <- ctss_gr
+  set_ctss_success <- TRUE
+}
+
+if (!set_ctss_success && exists("CTSStagCount", where = asNamespace("CAGEr"), mode = "function")) {
+  CTSStagCount(ce, sample_name) <- ctss_gr
+  set_ctss_success <- TRUE
+}
+
+if (!set_ctss_success) {
+  stop("Unable to assign CTSS counts: neither CTSStagCountSE nor CTSStagCount worked")
+}
+
 sampleLabels(ce) <- sample_name
 
 clusterCTSS(
@@ -57,5 +74,5 @@ exportToBed(
   qUp = 1,
   oneFile = TRUE,
   file = out_file,
-  score = "normalized"
+  score = "raw"
 )
